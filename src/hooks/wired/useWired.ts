@@ -1,7 +1,7 @@
 import { ConditionDefinition, Triggerable, TriggerDefinition, UpdateActionMessageComposer, UpdateConditionMessageComposer, UpdateTriggerMessageComposer, WiredActionDefinition, WiredFurniActionEvent, WiredFurniConditionEvent, WiredFurniTriggerEvent, WiredSaveSuccessEvent, SelectorDefinition, WiredFurniSelectorEvent, UpdateSelectorMessageComposer, VariableDefinition, WiredFurniVariableEvent, UpdateVariableMessageComposer, ExtraDefinition, WiredFurniExtraEvent, UpdateExtraMessageComposer } from '@nitrots/nitro-renderer';
 import { useEffect, useState } from 'react';
 import { useBetween } from 'use-between';
-import { IsOwnerOfFloorFurniture, LocalizeText, SendMessageComposer, WiredFurniType, WiredSelectionVisualizer } from '../../api';
+import { GetRoomSession, IsOwnerOfFloorFurniture, LocalizeText, SendMessageComposer, WiredFurniType, WiredSelectionVisualizer } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
 
@@ -19,10 +19,11 @@ const useWiredState = () =>
 
     const serializedSelectionLimit = trigger?.maximumItemSelectionCount ?? 0;
     const maximumItemSelectionCount = serializedSelectionLimit > 0 ? serializedSelectionLimit : (allowsFurni > WiredFurniType.STUFF_SELECTION_OPTION_NONE ? DEFAULT_MAXIMUM_FURNI_SELECTION_COUNT : 0);
+    const canModify = !!trigger && (trigger.canModify !== false || ((trigger instanceof VariableDefinition) && !!GetRoomSession()?.isRoomOwner));
 
     const saveWired = () =>
     {
-        if(!trigger || trigger.canModify === false) return;
+        if(!trigger || !canModify) return;
 
         const save = (trigger: Triggerable) =>
         {
@@ -167,7 +168,7 @@ const useWiredState = () =>
         }
     }, [ trigger ]);
 
-    return { trigger, setTrigger, intParams, setIntParams, stringParam, setStringParam, furniIds, setFurniIds, actionDelay, setActionDelay, maximumItemSelectionCount, setAllowsFurni, saveWired, selectObjectForWired };
+    return { trigger, setTrigger, intParams, setIntParams, stringParam, setStringParam, furniIds, setFurniIds, actionDelay, setActionDelay, maximumItemSelectionCount, setAllowsFurni, canModify, saveWired, selectObjectForWired };
 }
 
 export const useWired = () => useBetween(useWiredState);

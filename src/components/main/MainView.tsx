@@ -25,7 +25,7 @@ import { RightSideView } from '../right-side/RightSideView';
 import { RoomView } from '../room/RoomView';
 import { AreaHideView } from '../room-tools/AreaHideView';
 import { ToolbarView } from '../toolbar/ToolbarView';
-import { WiredCreatorToolsView } from '../wired-creator-tools/WiredCreatorToolsView';
+import { WiredCreatorToolsView } from '../wired-creator-tools-habbo/WiredCreatorToolsView';
 import { ChestView } from '../wired-chests/ChestView';
 import { ContractView } from '../wired-chests/ContractView';
 import { RewardPopupView } from '../wired-chests/RewardPopupView';

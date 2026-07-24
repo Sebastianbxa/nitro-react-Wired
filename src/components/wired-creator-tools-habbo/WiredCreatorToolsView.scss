@@ -1,0 +1,558 @@
+.habbo-wired-window {
+    position: relative;
+    display: block;
+    image-rendering: pixelated;
+    font-synthesis: none;
+}
+
+.habbo-wired-window.is-hidden {
+    display: none;
+}
+
+.habbo-wired-window .habbo-layout-appended-slot {
+    pointer-events: none;
+}
+
+.habbo-wired-window .habbo-layout-appended-slot > * {
+    pointer-events: auto;
+}
+
+.habbo-wired-table {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 1px;
+    color: #000;
+    overflow: hidden;
+}
+
+.habbo-wired-table-border {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.habbo-wired-table-inner {
+    position: absolute;
+    inset: 5px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+.habbo-wired-table-header,
+.habbo-wired-table-row {
+    display: flex;
+    flex: 0 0 20px;
+    min-width: 0;
+}
+
+.habbo-wired-table-header {
+    flex-basis: 23px;
+    background: #fff;
+}
+
+.habbo-wired-table-splitter {
+    flex: 0 0 1px;
+    background: rgba(80, 80, 0, .31);
+}
+
+.habbo-wired-table-body {
+    position: relative;
+    min-height: 0;
+    flex: 1 1 auto;
+}
+
+.habbo-wired-scroll-region {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.habbo-wired-scroll-content {
+    position: absolute;
+    inset: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.habbo-wired-scroll-region.has-overflow > .habbo-wired-scroll-content {
+    right: 17px;
+}
+
+.habbo-wired-scroll-content-inner {
+    position: relative;
+    min-height: 100%;
+}
+
+.habbo-wired-scrollbar {
+    position: absolute;
+    z-index: 4;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 17px;
+}
+
+.habbo-wired-scrollbar button {
+    position: absolute;
+    left: 0;
+    width: 17px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.habbo-wired-scrollbar canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.habbo-wired-scroll-up {
+    top: 0;
+    height: 16px;
+}
+
+.habbo-wired-scroll-down {
+    bottom: 0;
+    height: 16px;
+}
+
+.habbo-wired-scroll-track {
+    top: 16px;
+    bottom: 16px;
+    height: auto;
+}
+
+.habbo-wired-scroll-thumb {
+    z-index: 1;
+    min-height: 12px;
+    cursor: ns-resize;
+}
+
+.habbo-wired-table-row:nth-child(odd) {
+    background: #f9f9f9;
+}
+
+.habbo-wired-table-row:nth-child(even) {
+    background: #eaeaea;
+}
+
+.habbo-wired-table-row.is-selected {
+    background: #b8e2fc;
+}
+
+.habbo-wired-table-row.is-clickable {
+    cursor: pointer;
+}
+
+.habbo-wired-table-row.is-live-updated.wired-tools-pulse-a {
+    animation: habbo-wired-row-pulse-a 420ms ease-out;
+}
+
+.habbo-wired-table-row.is-live-updated.wired-tools-pulse-b {
+    animation: habbo-wired-row-pulse-b 420ms ease-out;
+}
+
+.habbo-wired-table-cell {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    height: 100%;
+    padding: 1px 4px 0;
+    overflow: hidden;
+}
+
+.habbo-wired-table-header .habbo-wired-table-cell {
+    padding-top: 2px;
+}
+
+.habbo-wired-table-text {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.habbo-wired-table-text > canvas {
+    display: block;
+    max-width: none;
+}
+
+.habbo-wired-table-cell.is-center {
+    justify-content: center;
+}
+
+.habbo-wired-table-cell.is-right {
+    justify-content: flex-end;
+}
+
+.habbo-wired-table-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 4px;
+}
+
+.habbo-wired-native-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: transparent;
+    caret-color: transparent;
+    cursor: text;
+}
+
+button.habbo-wired-native-overlay {
+    cursor: pointer;
+}
+
+.habbo-wired-dropmenu-popup {
+    position: fixed;
+    z-index: 10000;
+    max-height: 220px;
+    overflow: hidden;
+    background: #fff;
+    image-rendering: pixelated;
+}
+
+.habbo-wired-dropmenu-scroll .habbo-wired-scroll-content-inner {
+    box-sizing: border-box;
+    padding: 3px 0;
+}
+
+.habbo-wired-dropmenu-option {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 21px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+}
+
+.habbo-wired-dropmenu-skin {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.habbo-wired-dropmenu-label {
+    position: absolute;
+    inset: 2px 6px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.habbo-wired-text-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-decoration: underline;
+}
+
+.habbo-wired-main-table {
+    width: 100%;
+    height: 100%;
+}
+
+.habbo-wired-inspection-preview {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background:
+        linear-gradient(45deg, rgba(255, 255, 255, .18) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, .18) 75%),
+        linear-gradient(45deg, rgba(255, 255, 255, .18) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, .18) 75%),
+        #9cb9c5;
+    background-position: 0 0, 8px 8px;
+    background-size: 16px 16px;
+}
+
+.habbo-wired-preview-surface {
+    position: absolute;
+    inset: 5px;
+    overflow: hidden;
+    pointer-events: none !important;
+}
+
+.habbo-wired-preview-instruction {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    opacity: .6;
+}
+
+.habbo-wired-inspection-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    image-rendering: pixelated;
+}
+
+.habbo-wired-room-totals {
+    position: absolute;
+    left: 241px;
+    top: 50px;
+    display: grid;
+    width: 221px;
+    height: 30px;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    padding: 2px 5px;
+    background: rgba(255, 255, 255, .76);
+    border: 1px solid rgba(61, 91, 104, .45);
+    overflow: hidden;
+    pointer-events: none !important;
+}
+
+.habbo-wired-room-total {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    overflow: hidden;
+}
+
+.habbo-wired-room-total canvas {
+    max-width: 100%;
+}
+
+.habbo-wired-custom-transaction-filters {
+    position: absolute;
+    left: 415px;
+    top: 10px;
+    display: flex;
+    width: 365px;
+    height: 31px;
+    align-items: center;
+    gap: 6px;
+}
+
+.habbo-wired-custom-transaction-filters .habbo-wired-filter-field {
+    position: relative;
+    height: 24px;
+    flex: 1 1 auto;
+    border: 1px solid #777;
+    background: #fff;
+}
+
+.habbo-wired-custom-transaction-filters .habbo-wired-filter-value {
+    position: absolute;
+    inset: 4px 6px;
+    overflow: hidden;
+}
+
+.habbo-wired-custom-transaction-filters .habbo-wired-filter-type {
+    flex-basis: 112px;
+}
+
+.habbo-wired-transaction-items {
+    display: grid;
+    width: 100%;
+    min-height: 100%;
+    grid-template-columns: repeat(auto-fill, 55px);
+    grid-auto-rows: 55px;
+    align-content: start;
+    gap: 4px;
+}
+
+.habbo-wired-transaction-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, .72);
+    border: 1px solid #87969d;
+}
+
+.habbo-wired-transaction-item img {
+    max-width: 48px;
+    max-height: 44px;
+    image-rendering: pixelated;
+}
+
+.habbo-wired-transaction-quantity {
+    position: absolute;
+    right: 2px;
+    bottom: 1px;
+}
+
+.habbo-wired-coin-item img {
+    width: 28px;
+    height: 28px;
+}
+
+.habbo-wired-value-editor {
+    width: 100%;
+    height: 17px;
+    padding: 0 2px;
+    border: 1px solid #707070;
+    background: #fff;
+    font: 11px Arial, sans-serif;
+}
+
+.habbo-wired-value-button {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+}
+
+.habbo-wired-meta-pair {
+    display: flex;
+    width: 100%;
+    height: 20px;
+    align-items: center;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.habbo-wired-meta-pair > span {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+}
+
+.habbo-wired-standalone-dropmenu {
+    position: relative;
+    width: 100%;
+    height: 25px;
+}
+
+.habbo-wired-standalone-dropmenu > canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.habbo-wired-standalone-dropmenu > span {
+    position: absolute;
+    left: 6px;
+    top: 4px;
+    right: 22px;
+    overflow: hidden;
+}
+
+.habbo-wired-error-icon {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.habbo-wired-error-icon.is-error {
+    background: #c8382c;
+}
+
+.habbo-wired-error-icon.is-warning,
+.habbo-wired-error-icon.is-warn {
+    background: #e8a329;
+}
+
+.habbo-wired-highlight-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    pointer-events: none;
+}
+
+.habbo-wired-highlight-bubble {
+    position: relative;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .45));
+}
+
+.habbo-wired-highlight-bubble.is-live-updated.wired-tools-pulse-a {
+    animation: habbo-wired-highlight-pulse-a 420ms ease-out;
+}
+
+.habbo-wired-highlight-bubble.is-live-updated.wired-tools-pulse-b {
+    animation: habbo-wired-highlight-pulse-b 420ms ease-out;
+}
+
+.habbo-wired-highlight-bubble .habbo-layout-view {
+    pointer-events: none;
+}
+
+@keyframes habbo-wired-row-pulse-a {
+    0%, 100% {
+        background-color: inherit;
+        box-shadow: inset 0 0 0 0 rgba(44, 174, 188, 0);
+    }
+
+    32% {
+        background-color: #d9f7fb;
+        box-shadow: inset 0 0 0 1px rgba(44, 174, 188, .72), 0 0 7px rgba(44, 174, 188, .28);
+    }
+}
+
+@keyframes habbo-wired-row-pulse-b {
+    0%, 100% {
+        background-color: inherit;
+        box-shadow: inset 0 0 0 0 rgba(44, 174, 188, 0);
+    }
+
+    32% {
+        background-color: #d9f7fb;
+        box-shadow: inset 0 0 0 1px rgba(44, 174, 188, .72), 0 0 7px rgba(44, 174, 188, .28);
+    }
+}
+
+@keyframes habbo-wired-highlight-pulse-a {
+    0%, 100% {
+        transform: translateY(0);
+        filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .45));
+    }
+
+    36% {
+        transform: translateY(-2px);
+        filter: drop-shadow(0 0 7px rgba(44, 174, 188, .72)) drop-shadow(0 1px 1px rgba(0, 0, 0, .45));
+    }
+}
+
+@keyframes habbo-wired-highlight-pulse-b {
+    0%, 100% {
+        transform: translateY(0);
+        filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .45));
+    }
+
+    36% {
+        transform: translateY(-2px);
+        filter: drop-shadow(0 0 7px rgba(44, 174, 188, .72)) drop-shadow(0 1px 1px rgba(0, 0, 0, .45));
+    }
+}

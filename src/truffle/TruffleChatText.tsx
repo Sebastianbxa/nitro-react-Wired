@@ -2,16 +2,20 @@ import type { TruffleBuffer } from 'truffle-text';
 import type { PackedTruffleText } from 'truffle-text/packed';
 import { getTruffle } from 'truffle-text/react';
 import { FC, useLayoutEffect, useMemo, useRef } from 'react';
+import { resolveHabboXmlTextStyle } from './HabboTruffleTextFormat';
+import type { TruffleTextFormat } from './TruffleTextView';
 
 interface TruffleChatTextProps
 {
     username?: string;
     text?: string;
-    nameStyle: string;
-    messageStyle: string;
+    nameStyle: TruffleTextFormat;
+    messageStyle: TruffleTextFormat;
     maxWidth: number;
     nameColor?: number;
     messageColor?: number;
+    showCaret?: boolean;
+    caretColor?: number;
 }
 
 interface RenderedSegment
@@ -27,10 +31,10 @@ interface RenderedLine
     y: number;
 }
 
-const measureWidth = (truffle: PackedTruffleText, text: string, style: string) =>
+const measureWidth = (truffle: PackedTruffleText, text: string, style: TruffleTextFormat) =>
     truffle.measure(text, style).textWidth;
 
-const splitLongToken = (truffle: PackedTruffleText, token: string, style: string, width: number) =>
+const splitLongToken = (truffle: PackedTruffleText, token: string, style: TruffleTextFormat, width: number) =>
 {
     const characters = Array.from(token);
     let splitAt = 1;
@@ -45,7 +49,7 @@ const splitLongToken = (truffle: PackedTruffleText, token: string, style: string
     return [ characters.slice(0, splitAt).join(''), characters.slice(splitAt).join('') ];
 }
 
-const wrapMessage = (truffle: PackedTruffleText, text: string, style: string, maxWidth: number, firstLineOffset: number) =>
+const wrapMessage = (truffle: PackedTruffleText, text: string, style: TruffleTextFormat, maxWidth: number, firstLineOffset: number) =>
 {
     const lines: string[] = [];
     const tokens = text.replace(/\r\n?/g, '\n').match(/\n|[^\S\n]+|[^\s]+/g) ?? [ '' ];
@@ -113,9 +117,28 @@ const drawBuffer = (context: CanvasRenderingContext2D, buffer: TruffleBuffer, x:
     context.drawImage(source, x, y);
 }
 
+const getVisibleVerticalBounds = (buffer: TruffleBuffer) =>
+{
+    let top = buffer.height;
+    let bottom = -1;
+
+    for(let y = 0; y < buffer.height; y++)
+    {
+        for(let x = 0; x < buffer.width; x++)
+        {
+            if(!buffer.data[((y * buffer.width) + x) * 4 + 3]) continue;
+
+            top = Math.min(top, y);
+            bottom = Math.max(bottom, y);
+        }
+    }
+
+    return (bottom >= top) ? { top, bottom } : { top: 0, bottom: Math.max(0, buffer.height - 1) };
+}
+
 export const TruffleChatText: FC<TruffleChatTextProps> = props =>
 {
-    const { username = '', text = '', nameStyle, messageStyle, maxWidth, nameColor, messageColor } = props;
+    const { username = '', text = '', nameStyle, messageStyle, maxWidth, nameColor, messageColor, showCaret = false, caretColor = 0xAAAAAA } = props;
     const canvasRef = useRef<HTMLCanvasElement>();
     const rendered = useMemo(() =>
     {
@@ -123,55 +146,95 @@ export const TruffleChatText: FC<TruffleChatTextProps> = props =>
 
         if(!truffle) return null;
 
+        const resolvedNameStyle = resolveHabboXmlTextStyle(nameStyle);
+        const resolvedMessageStyle = resolveHabboXmlTextStyle(messageStyle);
+
         const nameText = username ? `${ username }: ` : '';
-        const nameWidth = nameText ? measureWidth(truffle, nameText, nameStyle) : 0;
-        const messageLines = wrapMessage(truffle, text, messageStyle, maxWidth, nameWidth);
+        const nameWidth = nameText ? measureWidth(truffle, nameText, resolvedNameStyle) : 0;
+        const messageLines = wrapMessage(truffle, text, resolvedMessageStyle, maxWidth, nameWidth);
         const lines: RenderedLine[] = [];
         let canvasWidth = 1;
-        let canvasHeight = 0;
+        let canvasHeight = 1;
+        let lineY = 0;
 
         messageLines.forEach((messageLine, index) =>
         {
             const segments: RenderedSegment[] = [];
-            let lineHeight = 1;
+            let lineHeight = Math.max(1, truffle.measure(messageLine || ' ', resolvedMessageStyle).textHeight);
+            let bufferHeight = 1;
 
             if((index === 0) && nameText)
             {
-                const buffer = truffle.renderToBuffer(nameText, nameStyle, nameColor === undefined ? {} : { color: nameColor });
+                const buffer = truffle.renderToBuffer(nameText, resolvedNameStyle, nameColor === undefined ? {} : { color: nameColor });
                 segments.push({ buffer, x: 0 });
-                lineHeight = Math.max(lineHeight, buffer.height);
+                lineHeight = Math.max(lineHeight, truffle.measure(nameText, resolvedNameStyle).textHeight);
+                bufferHeight = Math.max(bufferHeight, buffer.height);
                 canvasWidth = Math.max(canvasWidth, buffer.width);
             }
 
             if(messageLine)
             {
                 const x = ((index === 0) && nameText) ? Math.round(nameWidth) : 0;
-                const buffer = truffle.renderToBuffer(messageLine, messageStyle, messageColor === undefined ? {} : { color: messageColor });
+                const buffer = truffle.renderToBuffer(messageLine, resolvedMessageStyle, messageColor === undefined ? {} : { color: messageColor });
                 segments.push({ buffer, x });
-                lineHeight = Math.max(lineHeight, buffer.height);
+                bufferHeight = Math.max(bufferHeight, buffer.height);
                 canvasWidth = Math.max(canvasWidth, x + buffer.width);
             }
 
-            lines.push({ segments, height: lineHeight, y: canvasHeight });
-            canvasHeight += lineHeight;
+            lines.push({ segments, height: lineHeight, y: lineY });
+            canvasHeight = Math.max(canvasHeight, lineY + bufferHeight);
+            lineY += lineHeight;
         });
+
+        const lastLine = lines[lines.length - 1];
+        const lastLineWidth = lastLine.segments.reduce((width, segment) => Math.max(width, segment.x + segment.buffer.width), 0);
+        const caretProbe = truffle.renderToBuffer('|', resolvedMessageStyle, messageColor === undefined ? {} : { color: messageColor });
+        const caretBounds = getVisibleVerticalBounds(caretProbe);
+        const caretX = Math.max(0, lastLineWidth - (lastLineWidth ? 4 : 0));
+        const caretY = lastLine.y + caretBounds.top + 1;
+        const caretHeight = Math.max(1, caretBounds.bottom - caretBounds.top + 1);
 
         return {
             lines,
-            width: Math.max(1, Math.ceil(canvasWidth)),
-            height: Math.max(1, Math.ceil(canvasHeight))
+            width: Math.max(1, Math.ceil(canvasWidth), showCaret ? (caretX + 1) : 1),
+            height: Math.max(1, Math.ceil(canvasHeight), showCaret ? (caretY + caretHeight) : 1),
+            caretX,
+            caretY,
+            caretHeight
         };
-    }, [ maxWidth, messageColor, messageStyle, nameColor, nameStyle, text, username ]);
+    }, [ maxWidth, messageColor, messageStyle, nameColor, nameStyle, showCaret, text, username ]);
 
     useLayoutEffect(() =>
     {
         if(!rendered || !canvasRef.current) return;
 
         const context = canvasRef.current.getContext('2d');
-        context.clearRect(0, 0, rendered.width, rendered.height);
+        let caretVisible = true;
 
-        rendered.lines.forEach(line => line.segments.forEach(segment => drawBuffer(context, segment.buffer, segment.x, line.y)));
-    }, [ rendered ]);
+        const draw = () =>
+        {
+            context.clearRect(0, 0, rendered.width, rendered.height);
+            rendered.lines.forEach(line => line.segments.forEach(segment => drawBuffer(context, segment.buffer, segment.x, line.y)));
+
+            if(showCaret && caretVisible)
+            {
+                context.fillStyle = `#${ caretColor.toString(16).padStart(6, '0') }`;
+                context.fillRect(rendered.caretX, rendered.caretY, 1, rendered.caretHeight);
+            }
+        }
+
+        draw();
+
+        if(!showCaret) return;
+
+        const interval = window.setInterval(() =>
+        {
+            caretVisible = !caretVisible;
+            draw();
+        }, 500);
+
+        return () => window.clearInterval(interval);
+    }, [ caretColor, rendered, showCaret ]);
 
     if(!rendered) return null;
 

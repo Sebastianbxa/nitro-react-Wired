@@ -61,7 +61,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
 
     const [ wiredName, setWiredName ] = useState<string>(null);
     const [ needsSave, setNeedsSave ] = useState<boolean>(false);
-    const { trigger = null, setTrigger = null, setIntParams = null, setStringParam = null, furniIds = [], setFurniIds = null, setAllowsFurni = null, saveWired = null } = useWired();
+    const { trigger = null, setTrigger = null, setIntParams = null, setStringParam = null, furniIds = [], setFurniIds = null, setAllowsFurni = null, canModify = false, saveWired = null } = useWired();
 
     const clearFurniSelection = useCallback(() =>
     {
@@ -78,7 +78,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
 
     const onSave = () =>
     {
-        if(trigger?.canModify === false) return;
+        if(!canModify) return;
         if(validate && !validate()) return;
         if(save) save();
         setNeedsSave(true);
@@ -161,7 +161,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
     const hasDelaySlot = afterSelectorSlot !== null;
     const combineFurniAndSources = showFurniSelectionCaption && hasSourceSelector && !hasDelaySlot;
     const showSeparateSources = hasSourceSelector && !combineFurniAndSources;
-    const isViewOnly = trigger?.canModify === false;
+    const isViewOnly = !!trigger && !canModify;
     const titleText = isViewOnly ? `${ LocalizeText('wiredfurni.title') } - View Only Mode` : LocalizeText('wiredfurni.title');
     const showButtons = !isViewOnly;
 

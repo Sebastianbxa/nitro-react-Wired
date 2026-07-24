@@ -2,7 +2,6 @@ import type { TruffleBuffer } from 'truffle-text';
 import type { PackedTruffleText } from 'truffle-text/packed';
 import { getTruffle } from 'truffle-text/react';
 import { FC, useLayoutEffect, useMemo, useRef } from 'react';
-import { resolveHabboXmlTextStyle } from './HabboTruffleTextFormat';
 import type { TruffleTextFormat } from './TruffleTextView';
 
 interface TruffleChatTextProps
@@ -146,8 +145,8 @@ export const TruffleChatText: FC<TruffleChatTextProps> = props =>
 
         if(!truffle) return null;
 
-        const resolvedNameStyle = resolveHabboXmlTextStyle(nameStyle);
-        const resolvedMessageStyle = resolveHabboXmlTextStyle(messageStyle);
+        const resolvedNameStyle = nameStyle;
+        const resolvedMessageStyle = messageStyle;
 
         const nameText = username ? `${ username }: ` : '';
         const nameWidth = nameText ? measureWidth(truffle, nameText, resolvedNameStyle) : 0;

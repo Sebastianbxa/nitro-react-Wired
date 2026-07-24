@@ -4,7 +4,8 @@ import { ChatBubbleMessage, GetRoomEngine } from '../../../../api';
 import { TruffleChatText } from '../../../../truffle';
 
 const WHITE_TEXT_BUBBLES = new Set([ 2, 8, 10, 14, 15, 24, 25, 27, 31 ]);
-const HIDDEN_USERNAME_BUBBLES = new Set([ 1, 34, 200, 201, 202, 210, 211, 212, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 250, 251, 252 ]);
+const SHOW_MESSAGE_BUBBLES = new Set([ 34, 200, 201, 202, 210, 211, 212, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 250, 251, 252 ]);
+const HIDDEN_USERNAME_BUBBLES = new Set([ 1, ...SHOW_MESSAGE_BUBBLES ]);
 
 interface ChatWidgetMessageViewProps
 {
@@ -51,6 +52,7 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = props =>
     const messageColor = ((chat.type === 1) && (bubbleTextColor === 0x000000)) ? 0x595959 : bubbleTextColor;
     const contentWidth = Math.max(1, (chat.bubbleWidth || getBubbleWidth) - 40);
     const username = HIDDEN_USERNAME_BUBBLES.has(chat.styleId) ? '' : chat.username;
+    const isShowMessage = SHOW_MESSAGE_BUBBLES.has(chat.styleId);
 
     useEffect(() =>
     {
@@ -108,15 +110,17 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = props =>
                         <div className="user-image" style={ { backgroundImage: `url(${ chat.imageUrl })` } } /> }
                 </div>
                 <div className="chat-content" style={ { textAlign: chat.textAlign ?? undefined } }>
-                    <TruffleChatText
-                        username={ username }
-                        text={ chat.text }
-                        nameStyle={ truffleStyles.name }
-                        messageStyle={ truffleStyles.message }
-                        maxWidth={ contentWidth }
-                        nameColor={ bubbleTextColor }
-                        messageColor={ messageColor }
-                    />
+                    { isShowMessage
+                        ? <span className="message" dangerouslySetInnerHTML={ { __html: chat.formattedText } } />
+                        : <TruffleChatText
+                            username={ username }
+                            text={ chat.text }
+                            nameStyle={ truffleStyles.name }
+                            messageStyle={ truffleStyles.message }
+                            maxWidth={ contentWidth }
+                            nameColor={ bubbleTextColor }
+                            messageColor={ messageColor }
+                        /> }
                 </div>
                 <div className="pointer" />
             </div>

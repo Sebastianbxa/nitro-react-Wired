@@ -193,6 +193,13 @@ type WiredTextInputProps = InputHTMLAttributes<HTMLInputElement> & {
     bitmapAlign?: 'left' | 'center';
 };
 
+export const sanitizeWiredIntegerText = (value: string) =>
+{
+    const negative = value.startsWith('-');
+    const digits = value.replace(/\D/g, '');
+    return `${ negative ? '-' : '' }${ digits }`;
+};
+
 export const WiredTextInput: FC<WiredTextInputProps> = props =>
 {
     const { compact = false, bitmapFont, bitmapAlign = 'left', className = '', ...rest } = props;
@@ -1124,11 +1131,12 @@ export interface WiredValueOrVariableProps extends WiredVariablePickerProps
     onValueChange: (value: string) => void;
     min: number;
     max: number;
+    preserveIntegerText?: boolean;
 }
 
 export const WiredValueOrVariable: FC<WiredValueOrVariableProps> = props =>
 {
-    const { radioName, mode, onModeChange, value, onValueChange, min, max, ...pickerProps } = props;
+    const { radioName, mode, onModeChange, value, onValueChange, min, max, preserveIntegerText = false, ...pickerProps } = props;
     const { variableType, variableName, onVariableNameChange, variables } = pickerProps;
     const variableDisabled = mode !== WIRED_REFERENCE_FROM_VARIABLE;
 
@@ -1136,7 +1144,16 @@ export const WiredValueOrVariable: FC<WiredValueOrVariableProps> = props =>
         <>
             <Flex alignItems="center" gap={ 1 }>
                 <WiredRadio name={ radioName } checked={ mode === WIRED_REFERENCE_SET_VALUE } onChange={ () => onModeChange(WIRED_REFERENCE_SET_VALUE) } label={ LocalizeText('wiredfurni.params.variables.reference_value.set_value') } />
-                <WiredTextInput compact type="number" min={ min } max={ max } value={ value } onChange={ event => onValueChange(clampWiredText(event.target.value, min, max)) } />
+                <WiredTextInput
+                    compact
+                    type={ preserveIntegerText ? 'text' : 'number' }
+                    inputMode="numeric"
+                    min={ preserveIntegerText ? undefined : min }
+                    max={ preserveIntegerText ? undefined : max }
+                    value={ value }
+                    onChange={ event => onValueChange(preserveIntegerText
+                        ? sanitizeWiredIntegerText(event.target.value)
+                        : clampWiredText(event.target.value, min, max)) } />
             </Flex>
             <Flex alignItems="center" justifyContent="between" gap={ 1 }>
                 <WiredRadio name={ radioName } checked={ mode === WIRED_REFERENCE_FROM_VARIABLE } onChange={ () => onModeChange(WIRED_REFERENCE_FROM_VARIABLE) } label={ LocalizeText('wiredfurni.params.variables.reference_value.from_variable') } />

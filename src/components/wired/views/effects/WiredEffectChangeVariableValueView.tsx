@@ -34,6 +34,7 @@ interface VariableEffectData
     targetVariable?: string;
     referenceVariable?: string;
     referenceValue?: number;
+    referenceValueText?: string;
     globalVariables?: string[];
     globalValueVariables?: string[];
     furniVariables?: string[];
@@ -147,7 +148,7 @@ export const WiredEffectChangeVariableValueView: FC<{}> = props =>
         setStringParam(JSON.stringify({
             targetVariable,
             referenceVariable,
-            referenceValue: Number(referenceValue || 0)
+            referenceValueText: referenceValue || '0'
         }));
         setIntParams([
             targetVariableType,
@@ -178,7 +179,7 @@ export const WiredEffectChangeVariableValueView: FC<{}> = props =>
         setReferenceMode(intData[2] ?? data.referenceMode ?? WIRED_REFERENCE_SET_VALUE);
         setReferenceVariableType(savedReferenceVariableType);
         setReferenceVariable(wiredVariableIsSelectable(savedReferenceVariable, savedReferenceVariables ?? [], subVariables) ? savedReferenceVariable : '');
-        setReferenceValue(String(data.referenceValue ?? 0));
+        setReferenceValue(data.referenceValueText ?? String(data.referenceValue ?? 0));
         setDestinationSource(normalizeWiredSource(intData[4] ?? data.destinationSource ?? WIRED_VARIABLE_GLOBAL, getSourceOptions(savedTargetVariableType)));
         setReferenceSource(normalizeWiredSource(intData[5] ?? data.referenceSource ?? WIRED_VARIABLE_GLOBAL, getSourceOptions(savedReferenceVariableType)));
     }, [ trigger, data, targetVariables, referenceVariables, subVariables ]);
@@ -234,8 +235,9 @@ export const WiredEffectChangeVariableValueView: FC<{}> = props =>
                     onModeChange={ setReferenceMode }
                     value={ referenceValue }
                     onValueChange={ setReferenceValue }
-                    min={ -999999999 }
-                    max={ 999999999 }
+                    min={ Number.MIN_SAFE_INTEGER }
+                    max={ Number.MAX_SAFE_INTEGER }
+                    preserveIntegerText
                     variableType={ referenceVariableType }
                     onVariableTypeChange={ setNormalizedReferenceType }
                     variableName={ referenceVariable }

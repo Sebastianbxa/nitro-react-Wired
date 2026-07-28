@@ -556,6 +556,7 @@ const VARIABLE_DEFINITIONS: Record<VariableType, VariableDefinition[]> = {
         createInternalVariable('@dimensions.y', 'Furni', 'Yes', 'No'),
         createInternalVariable('@owner_id', 'Furni', 'Yes', 'No'),
         createInternalVariable('@wallitem_offset', 'Furni', 'Yes', 'Yes'),
+        createInternalVariable('~teleport.target_id', 'Furni', 'Yes', 'Yes'),
         createInternalVariable('@chest.available_amount', 'Furni', 'Yes', 'No'),
         createInternalVariable('@chest.capacity', 'Furni', 'Yes', 'No'),
         createInternalVariable('@chest.is_auto_lock', 'Furni', 'Yes', 'No', [
@@ -902,6 +903,7 @@ const CONDITIONAL_FURNI_INSPECTION_VARIABLES = new Set([
     '@can_sit_on',
     '@can_lay_on',
     '@wallitem_offset',
+    '~teleport.target_id',
     '@area_hide.width',
     '@area_hide.length',
     '@area_hide.root_x',
@@ -1099,10 +1101,10 @@ const getInspectionVariables = (inspectionType: InspectionType, inspectionValues
     return [ ...sortInspectionVariableDefinitions(createdVariables), ...internalVariables ];
 };
 
-const isCreatedInspectionVariable = (variableKey: string) => !!variableKey && !variableKey.startsWith('@');
+const isCreatedInspectionVariable = (variableKey: string) => !!variableKey && !variableKey.startsWith('@') && !variableKey.startsWith('~');
 
 const EDITABLE_INTERNAL_INSPECTION_VARIABLES: Record<InspectionType, Set<string>> = {
-    furni: new Set([ '@state', '@position.x', '@position.y', '@rotation', '@altitude', '@area_hide.width', '@area_hide.length', '@area_hide.root_x', '@area_hide.root_y' ]),
+    furni: new Set([ '@state', '@position.x', '@position.y', '@rotation', '@altitude', '~teleport.target_id', '@area_hide.width', '@area_hide.length', '@area_hide.root_x', '@area_hide.root_y' ]),
     user: new Set([ '@position.x', '@position.y', '@direction', '@altitude' ]),
     global: new Set([ '@teams.red.score', '@teams.green.score', '@teams.blue.score', '@teams.yellow.score' ])
 };

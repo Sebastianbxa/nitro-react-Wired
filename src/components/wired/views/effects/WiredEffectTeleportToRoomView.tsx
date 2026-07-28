@@ -3,8 +3,8 @@ import { FC } from 'react';
 import { GetRoomEngine, LocalizeText, WiredFurniType } from '../../../../api';
 import { useNotification, useWired } from '../../../../hooks';
 import { WiredEffectBaseView } from './WiredEffectBaseView';
-import { createUserSourceSelector, useWiredEffectSource, USER_SOURCE_OPTIONS } from './WiredEffectSourceSelector';
-import { WIRED_SOURCE_TRIGGER } from '../WiredControls';
+import { createFurniSourceSelector, createUserSourceSelector, FURNI_SOURCE_OPTIONS, useWiredEffectSource, USER_SOURCE_OPTIONS } from './WiredEffectSourceSelector';
+import { WIRED_SOURCE_SELECTED, WIRED_SOURCE_TRIGGER } from '../WiredControls';
 
 const ROOM_LINKER = 'wf_room_linker';
 
@@ -12,7 +12,9 @@ export const WiredEffectTeleportToRoomView: FC<{}> = props =>
 {
     const { trigger = null, setIntParams = null, furniIds = [] } = useWired();
     const { simpleAlert = null } = useNotification();
-    const [ userSource, setUserSource, expanded, setExpanded ] = useWiredEffectSource(trigger, 0, WIRED_SOURCE_TRIGGER, USER_SOURCE_OPTIONS);
+    const [ furniSource, setFurniSource, furniExpanded, setFurniExpanded ] = useWiredEffectSource(trigger, 0, WIRED_SOURCE_SELECTED, FURNI_SOURCE_OPTIONS);
+    const [ userSource, setUserSource, userExpanded, setUserExpanded ] = useWiredEffectSource(trigger, 1, WIRED_SOURCE_TRIGGER, USER_SOURCE_OPTIONS);
+    const expanded = furniExpanded || userExpanded;
 
     const validate = () =>
     {
@@ -34,7 +36,7 @@ export const WiredEffectTeleportToRoomView: FC<{}> = props =>
         return true;
     }
 
-    const save = () => setIntParams([ userSource ]);
+    const save = () => setIntParams([ furniSource, userSource ]);
 
     return (
         <WiredEffectBaseView
@@ -42,8 +44,15 @@ export const WiredEffectTeleportToRoomView: FC<{}> = props =>
             hasSpecialInput={ true }
             save={ save }
             validate={ validate }
-            sourceSelectors={ [ createUserSourceSelector(userSource, setUserSource) ] }
+            sourceSelectors={ [
+                createFurniSourceSelector(furniSource, setFurniSource),
+                createUserSourceSelector(userSource, setUserSource)
+            ] }
             expanded={ expanded }
-            onToggleExpanded={ () => setExpanded(value => !value) } />
+            onToggleExpanded={ () =>
+            {
+                setFurniExpanded(!expanded);
+                setUserExpanded(!expanded);
+            } } />
     );
 }
